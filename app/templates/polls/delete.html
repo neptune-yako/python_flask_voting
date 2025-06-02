@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-header bg-danger text-white py-3">
+                <h2 class="mb-0">删除投票</h2>
+            </div>
+            <div class="card-body p-4">
+                <div class="alert alert-warning">
+                    <strong>警告：</strong> 您即将删除投票 <strong>"{{ poll.question }}"</strong>。此操作无法撤销，所有相关的投票数据将被永久删除。
+                </div>
+                
+                <div class="mb-4">
+                    <h5>投票详情：</h5>
+                    <p>创建时间：{{ poll.creation_timestamp.strftime('%Y-%m-%d %H:%M') }}</p>
+                    <p>选项数量：{{ poll.options.count() }}</p>
+                    <p>总投票数：{{ total_votes }}</p>
+                </div>
+                
+                <form method="POST" action="{{ url_for('polls.delete_poll', unique_id=poll.unique_share_id) }}">
+                    {{ form.hidden_tag() }}
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('polls.my_polls') }}" class="btn btn-outline-secondary">取消</a>
+                        {{ form.submit(class="btn btn-danger") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

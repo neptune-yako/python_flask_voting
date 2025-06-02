@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow">
+            <div class="card-header bg-white py-3">
+                <h2 class="mb-0">{{ poll.question }}</h2>
+                <p class="text-muted mb-0 small">创建于: {{ poll.creation_timestamp.strftime('%Y-%m-%d %H:%M') }}</p>
+            </div>
+            <div class="card-body p-4">
+                <h5 class="mb-3">投票结果 <span class="badge bg-secondary">{{ total_votes }}票</span></h5>
+                
+                {% if total_votes > 0 %}
+                    {% for option in options %}
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between mb-1">
+                                <div>{{ option.text }}</div>
+                                <div><strong>{{ option.vote_count }}票</strong> ({{ option.percentage }}%)</div>
+                            </div>
+                            <div class="progress result-bar">
+                                <div class="progress-bar" role="progressbar" style="width: {{ option.percentage }}%"></div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="alert alert-info">
+                        还没有人投票，分享链接邀请他人参与吧！
+                    </div>
+                {% endif %}
+            </div>
+            <div class="card-footer bg-white py-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <a href="{{ url_for('polls.poll_detail', unique_id=poll.unique_share_id) }}" class="text-primary">返回投票</a>
+                    <button type="button" class="btn btn-sm btn-outline-success copy-link" 
+                        data-link="{{ request.host_url }}poll/{{ poll.unique_share_id }}" 
+                        title="复制链接">
+                        复制分享链接
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 复制链接功能
+    const copyButton = document.querySelector('.copy-link');
+    copyButton.addEventListener('click', function() {
+        const link = this.getAttribute('data-link');
+        navigator.clipboard.writeText(link).then(() => {
+            // 临时改变按钮文字
+            const originalText = this.textContent;
+            this.textContent = '链接已复制!';
+            setTimeout(() => {
+                this.textContent = originalText;
+            }, 2000);
+        });
+    });
+});
+</script>
+{% endblock %} 

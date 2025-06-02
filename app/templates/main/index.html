@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row align-items-center py-5">
+    <div class="col-md-6 mb-4 mb-md-0">
+        <h1 class="display-4 fw-bold mb-4">轻松创建你的在线投票</h1>
+        <p class="lead mb-4">无论是选择聚餐地点，还是收集团队意见，都可以通过简单的几步快速创建投票，并实时查看结果。</p>
+        
+        {% if current_user.is_authenticated %}
+            <a href="{{ url_for('polls.create_poll') }}" class="btn btn-primary btn-lg px-4 me-2">立即创建投票</a>
+            <a href="{{ url_for('polls.my_polls') }}" class="btn btn-outline-secondary btn-lg px-4">查看我的投票</a>
+        {% else %}
+            <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg px-4 me-2">注册账号</a>
+            <a href="{{ url_for('auth.login') }}" class="btn btn-outline-secondary btn-lg px-4">登录</a>
+        {% endif %}
+    </div>
+    <div class="col-md-6">
+        <div class="card border-0 shadow">
+            <div class="card-body p-4">
+                <h5 class="card-title fw-bold">在线投票应用特点</h5>
+                <ul class="list-group list-group-flush mt-3">
+                    <li class="list-group-item bg-transparent border-0 py-2">
+                        <i class="bi bi-check-circle-fill text-primary me-2"></i> 简单易用的投票创建
+                    </li>
+                    <li class="list-group-item bg-transparent border-0 py-2">
+                        <i class="bi bi-check-circle-fill text-primary me-2"></i> 唯一分享链接，方便传播
+                    </li>
+                    <li class="list-group-item bg-transparent border-0 py-2">
+                        <i class="bi bi-check-circle-fill text-primary me-2"></i> 实时查看投票结果
+                    </li>
+                    <li class="list-group-item bg-transparent border-0 py-2">
+                        <i class="bi bi-check-circle-fill text-primary me-2"></i> 防止重复投票机制
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if recent_polls %}
+<div class="row mt-5">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="mb-0">所有投票</h3>
+            {% if current_user.is_authenticated %}
+                <a href="{{ url_for('polls.create_poll') }}" class="btn btn-primary">创建新投票</a>
+            {% endif %}
+        </div>
+        <div class="row">
+            {% for poll in recent_polls %}
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <h6 class="card-title text-truncate" title="{{ poll.question }}">{{ poll.question }}</h6>
+                            <p class="card-text text-muted small">
+                                创建者: {{ poll.creator.username }}<br>
+                                创建时间: {{ poll.creation_timestamp.strftime('%Y-%m-%d %H:%M') }}
+                            </p>
+                            <div class="d-flex gap-2">
+                                <a href="{{ url_for('polls.poll_detail', unique_id=poll.unique_share_id) }}" 
+                                   class="btn btn-sm btn-primary">参与投票</a>
+                                <a href="{{ url_for('polls.poll_results', unique_id=poll.unique_share_id) }}" 
+                                   class="btn btn-sm btn-outline-secondary">查看结果</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %} 

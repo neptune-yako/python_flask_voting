@@ -1,0 +1,87 @@
+/* 主色调 */
+:root {
+    --primary: #20C997;
+    --primary-dark: #17A67D;
+    --primary-light: #E0F8F0;
+}
+
+/* 修改Bootstrap主色调 */
+.btn-primary {
+    background-color: var(--primary);
+    border-color: var(--primary);
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active {
+    background-color: var(--primary-dark) !important;
+    border-color: var(--primary-dark) !important;
+}
+
+.text-primary {
+    color: var(--primary) !important;
+}
+
+.progress-bar {
+    background-color: var(--primary);
+}
+
+/* 卡片样式 */
+.card {
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* 表单样式 */
+.form-control:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 0.25rem rgba(32, 201, 151, 0.25);
+}
+
+/* 投票选项样式 */
+.poll-option {
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem;
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.poll-option:hover {
+    border-color: var(--primary);
+    background-color: var(--primary-light);
+}
+
+.poll-option.selected {
+    border-color: var(--primary);
+    background-color: var(--primary-light);
+}
+
+/* 结果页面样式 */
+.result-bar {
+    height: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+/* 分享链接样式 */
+.share-link {
+    background-color: #f8f9fa;
+    padding: 0.75rem;
+    border-radius: 0.25rem;
+    font-family: monospace;
+    word-break: break-all;
+}
+
+/* 响应式调整 */
+@media (max-width: 576px) {
+    .container {
+        padding-left: 1.25rem;
+        padding-right: 1.25rem;
+    }
+} 

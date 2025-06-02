@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="mb-0">我的投票</h2>
+            <a href="{{ url_for('polls.create_poll') }}" class="btn btn-primary">创建新投票</a>
+        </div>
+        
+        {% if polls %}
+            <div class="card shadow">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>投票问题</th>
+                                <th>创建时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for poll in polls %}
+                                <tr>
+                                    <td class="text-truncate" style="max-width: 300px;">{{ poll.question }}</td>
+                                    <td>{{ poll.creation_timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="{{ url_for('polls.poll_detail', unique_id=poll.unique_share_id) }}" class="btn btn-outline-primary">查看</a>
+                                            <a href="{{ url_for('polls.poll_results', unique_id=poll.unique_share_id) }}" class="btn btn-outline-secondary">结果</a>
+                                            <a href="{{ url_for('polls.edit_poll', unique_id=poll.unique_share_id) }}" class="btn btn-outline-warning">修改</a>
+                                            <a href="{{ url_for('polls.delete_poll', unique_id=poll.unique_share_id) }}" class="btn btn-outline-danger">删除</a>
+                                            <button type="button" class="btn btn-outline-success copy-link" 
+                                                data-link="{{ request.host_url }}poll/{{ poll.unique_share_id }}" 
+                                                title="复制链接">
+                                                分享
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% else %}
+            <div class="card shadow">
+                <div class="card-body text-center py-5">
+                    <h5 class="mb-3">您还没有创建任何投票</h5>
+                    <p class="text-muted">点击下方按钮创建您的第一个投票</p>
+                    <a href="{{ url_for('polls.create_poll') }}" class="btn btn-primary mt-2">创建新投票</a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 复制链接功能
+    const copyButtons = document.querySelectorAll('.copy-link');
+    copyButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const link = this.getAttribute('data-link');
+            navigator.clipboard.writeText(link).then(() => {
+                // 临时改变按钮文字
+                const originalText = this.textContent;
+                this.textContent = '已复制!';
+                setTimeout(() => {
+                    this.textContent = originalText;
+                }, 2000);
+            });
+        });
+    });
+});
+</script>
+{% endblock %} 

@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow">
+            <div class="card-header bg-white py-3">
+                <h2 class="mb-0">{{ poll.question }}</h2>
+                <p class="text-muted mb-0 small">创建于: {{ poll.creation_timestamp.strftime('%Y-%m-%d %H:%M') }}</p>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST" action="{{ url_for('polls.poll_detail', unique_id=poll.unique_share_id) }}">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="mb-4">
+                        {% for option_value, option_label in form.option.choices %}
+                            <div class="poll-option mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="{{ form.option.name }}" 
+                                           id="option{{ option_value }}" value="{{ option_value }}">
+                                    <label class="form-check-label w-100" for="option{{ option_value }}">
+                                        {{ option_label }}
+                                    </label>
+                                </div>
+                            </div>
+                        {% endfor %}
+                        
+                        {% for error in form.option.errors %}
+                            <div class="text-danger small mb-3">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        {{ form.submit(class="btn btn-primary btn-lg") }}
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer bg-white py-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <a href="{{ url_for('polls.poll_results', unique_id=poll.unique_share_id) }}" class="text-primary">查看当前结果</a>
+                    <button type="button" class="btn btn-sm btn-outline-success copy-link" 
+                        data-link="{{ request.host_url }}poll/{{ poll.unique_share_id }}" 
+                        title="复制链接">
+                        复制分享链接
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 复制链接功能
+    const copyButton = document.querySelector('.copy-link');
+    copyButton.addEventListener('click', function() {
+        const link = this.getAttribute('data-link');
+        navigator.clipboard.writeText(link).then(() => {
+            // 临时改变按钮文字
+            const originalText = this.textContent;
+            this.textContent = '链接已复制!';
+            setTimeout(() => {
+                this.textContent = originalText;
+            }, 2000);
+        });
+    });
+    
+    // 点击选项高亮效果
+    const pollOptions = document.querySelectorAll('.poll-option');
+    pollOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            // 移除所有选项的选中状态
+            pollOptions.forEach(opt => opt.classList.remove('selected'));
+            // 为当前选项添加选中状态
+            this.classList.add('selected');
+            // 选中单选按钮
+            const radio = this.querySelector('input[type="radio"]');
+            radio.checked = true;
+        });
+    });
+});
+</script>
+{% endblock %} 

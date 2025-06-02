@@ -1,0 +1,261 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow">
+            <div class="card-header bg-white py-3">
+                <h2 class="mb-0 text-center">井字棋游戏</h2>
+            </div>
+            <div class="card-body p-4">
+                <div class="text-center mb-4">
+                    <p class="lead">经典的井字棋游戏，你是X，电脑是O，谁先连成一线谁就获胜！</p>
+                </div>
+                
+                <div class="game-container text-center">
+                    <div class="game-status mb-4" id="gameStatus">
+                        <p class="lead fw-bold">游戏开始，请点击任意格子落子</p>
+                    </div>
+                    
+                    <div class="tictactoe-board mx-auto mb-4">
+                        <div class="row g-2">
+                            <div class="col-4">
+                                <div class="cell" data-index="0"></div>
+                            </div>
+                            <div class="col-4">
+                                <div class="cell" data-index="1"></div>
+                            </div>
+                            <div class="col-4">
+                                <div class="cell" data-index="2"></div>
+                            </div>
+                        </div>
+                        <div class="row g-2">
+                            <div class="col-4">
+                                <div class="cell" data-index="3"></div>
+                            </div>
+                            <div class="col-4">
+                                <div class="cell" data-index="4"></div>
+                            </div>
+                            <div class="col-4">
+                                <div class="cell" data-index="5"></div>
+                            </div>
+                        </div>
+                        <div class="row g-2">
+                            <div class="col-4">
+                                <div class="cell" data-index="6"></div>
+                            </div>
+                            <div class="col-4">
+                                <div class="cell" data-index="7"></div>
+                            </div>
+                            <div class="col-4">
+                                <div class="cell" data-index="8"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="score-board mb-4">
+                        <div class="d-flex justify-content-center">
+                            <div class="score-item me-5">
+                                <h5>电脑 (O)</h5>
+                                <p class="score" id="playerScore">0</p>
+                            </div>
+                            <div class="score-item ms-5">
+                                <h5>玩家 (X)</h5>
+                                <p class="score" id="computerScore">0</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-primary" id="resetButton">重新开始</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 游戏变量
+    const cells = document.querySelectorAll('.cell');
+    const gameStatus = document.getElementById('gameStatus');
+    const resetButton = document.getElementById('resetButton');
+    const playerScoreElement = document.getElementById('playerScore');
+    const computerScoreElement = document.getElementById('computerScore');
+    
+    let board = ['', '', '', '', '', '', '', '', ''];
+    let currentPlayer = 'X'; // 玩家总是X
+    let gameActive = true;
+    let playerScore = 0;
+    let computerScore = 0;
+    
+    // 获胜组合
+    const winConditions = [
+        [0, 1, 2], [3, 4, 5], [6, 7, 8], // 横向
+        [0, 3, 6], [1, 4, 7], [2, 5, 8], // 纵向
+        [0, 4, 8], [2, 4, 6]             // 对角线
+    ];
+    
+    // 初始化游戏
+    function initGame() {
+        board = ['', '', '', '', '', '', '', '', ''];
+        currentPlayer = 'X';
+        gameActive = true;
+        
+        // 清空棋盘
+        cells.forEach(cell => {
+            cell.textContent = '';
+            cell.classList.remove('player-x', 'player-o', 'win-cell');
+        });
+        
+        // 更新状态
+        gameStatus.innerHTML = '<p class="lead fw-bold">游戏开始，请点击任意格子落子</p>';
+    }
+    
+    // 检查获胜
+    function checkWin() {
+        let roundWon = false;
+        let winningCells = [];
+        
+        for (let i = 0; i < winConditions.length; i++) {
+            const [a, b, c] = winConditions[i];
+            if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+                roundWon = true;
+                winningCells = [a, b, c];
+                break;
+            }
+        }
+        
+        if (roundWon) {
+            // 高亮获胜格子
+            winningCells.forEach(index => {
+                cells[index].classList.add('win-cell');
+            });
+            
+            if (currentPlayer === 'X') {
+                playerScore++;
+                playerScoreElement.textContent = playerScore;
+                gameStatus.innerHTML = '<p class="lead fw-bold text-danger">电脑获胜！再接再厉！</p>';
+            } else {
+                computerScore++;
+                computerScoreElement.textContent = computerScore;
+                gameStatus.innerHTML = '<p class="lead fw-bold text-success">恭喜！你获胜了！</p>';
+            }
+            
+            gameActive = false;
+            return true;
+        }
+        
+        // 检查平局
+        if (!board.includes('')) {
+            gameStatus.innerHTML = '<p class="lead fw-bold text-warning">平局！</p>';
+            gameActive = false;
+            return true;
+        }
+        
+        return false;
+    }
+    
+    // 电脑走棋
+    function computerMove() {
+        if (!gameActive) return;
+        
+        // 简单AI: 随机选择一个空格
+        const emptyIndices = board.map((cell, index) => cell === '' ? index : null).filter(index => index !== null);
+        
+        if (emptyIndices.length > 0) {
+            const randomIndex = emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
+            setTimeout(() => {
+                makeMove(randomIndex, 'O');
+            }, 500); // 延迟一下，模拟思考
+        }
+    }
+    
+    // 落子
+    function makeMove(index, player) {
+        if (board[index] !== '' || !gameActive) return;
+        
+        board[index] = player;
+        cells[index].textContent = player;
+        cells[index].classList.add(player === 'X' ? 'player-x' : 'player-o');
+        
+        currentPlayer = player === 'X' ? 'O' : 'X';
+        
+        if (!checkWin()) {
+            if (currentPlayer === 'O') {
+                // 电脑回合
+                computerMove();
+            } else {
+                // 玩家回合
+                gameStatus.innerHTML = '<p class="lead fw-bold">轮到你了，请落子</p>';
+            }
+        }
+    }
+    
+    // 绑定事件
+    cells.forEach((cell, index) => {
+        cell.addEventListener('click', () => {
+            if (currentPlayer === 'X' && gameActive) {
+                makeMove(index, 'X');
+            }
+        });
+    });
+    
+    resetButton.addEventListener('click', initGame);
+    
+    // 初始化游戏
+    initGame();
+});
+</script>
+
+<style>
+.game-container {
+    min-height: 400px;
+}
+
+.tictactoe-board {
+    max-width: 300px;
+}
+
+.cell {
+    height: 90px;
+    background-color: #f8f9fa;
+    border: 2px solid #dee2e6;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.cell:hover {
+    background-color: #e9ecef;
+}
+
+.player-x {
+    color: #20C997; /* 主题绿色 */
+}
+
+.player-o {
+    color: #fd7e14; /* 橙色 */
+}
+
+.win-cell {
+    background-color: rgba(32, 201, 151, 0.2);
+    border-color: #20C997;
+}
+
+.score {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #495057;
+    margin: 0;
+}
+
+.score-item {
+    text-align: center;
+}
+</style>
+{% endblock %} 
